@@ -1,0 +1,2 @@
+# ignorar base de datos SQLite
+*.sqlite
