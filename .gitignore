@@ -1,7 +1,2 @@
 # ignorar base de datos SQLite
 *.sqlite
-
-#para que no se vuelva loco y suba todo
-data/
-*.lnk
-.DS_Store
