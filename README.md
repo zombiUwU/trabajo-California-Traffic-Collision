@@ -13,7 +13,7 @@ Desarrollar un análisis de datos sobre la siniestralidad vial en California (20
 
 - Analizar el perfil demográfico de las víctimas: Construir una pirámide de mortalidad segmentada por edad (victim_age) y sexo (victim_sex) para identificar qué grupos poblacionales sufren mayor impacto en colisiones fatales.
 
-- Determinar factores externos determinantes de una colisión: Determinar el impacto de las conductas de riesgo (cellphone_in_use, party_sobriety, entre otros...) y la eficacia del equipo de seguridad (victim_safety_equipment) en la severidad de las lesiones y la ocurrencia de víctimas fatales.
+- Determinar factores externos determinantes de una colisión: Determinar el impacto de las conductas de riesgo (cellphone_in_use, party_sobriety) y la eficacia del equipo de seguridad (victim_safety_equipment) en la severidad de las lesiones y la ocurrencia de víctimas fatales.
 
 - Visualizar la criticidad geográfica y temporal: Mapear los incidentes y su evolución anual para detectar si las políticas de seguridad vial han surtido efecto post-pandemia.
 
@@ -116,28 +116,18 @@ Posteriormente, se seleccionaron únicamente los incidentes de los últimos cuat
 ----------------------------------------------------------------
 
 ## Estructura del Repositorio
-Para mantener el orden que definimos, la carpeta de GitHub debería verse así:
-
-├── components/    #Elementos visuales aislados (gráficos, tablas, filtros).
-
-├── sections/         #Estructuras que organizan los componentes.
-
+Para mantener el orden que definimos, tu carpeta de GitHub debería verse así:
+Plaintext
+├── components/    #Elementos visuales aislados (gráficos, tablas, filtros) 
+├── sections/         #Estructuras que organizan los componentes
 ├── .gitignore/
-
 ├── .gitattributes/
-
 ├── data/               # Archivos parquets con la data (2018-2021)
-
 ├── app.py              # Código principal de la App de Streamlit
-
 ├── pruebas.ipynb  #Código de testeo de las funciones y gráficas
-
 ├── utils/              # Scripts de limpieza y procesamiento
-
 ├── dashboardd/          # Archivo .pbix de Power BI
-
 ├── requirements.txt    # Listado de librerías de Python
-
 └── README.md           # Este archivo
 
 ----------------------------------------------------------------
@@ -152,9 +142,6 @@ Proyecto realizado por estudiantes del segundo semestre de la carrera de Estadí
 
 
 -Kleyber Montoya
-
 -Milena Martinez
-
 -Zadquiel Nieves
-
 -Sebastian Valbuena
