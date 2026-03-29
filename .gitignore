@@ -1,2 +1,4 @@
 # ignorar base de datos SQLite
 *.sqlite
+data/*.zip
+data/California_modificada.zip
