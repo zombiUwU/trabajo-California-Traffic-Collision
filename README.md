@@ -91,7 +91,7 @@ Asegúrate de tener instalado:
 > **NOTA**: La instalacion del Hadoop solo es necesaria en Windows ya que pyspark y delta-spark estan diseñados para Linux, por lo tanto no se generan estos problemas en las diversas distribuciones de Linux
 
 **PROCEDIMIENTO**: Descarga los archivos de instalación de la carpeta */Hadoop 3.3.5/bin necesarios (winutils.exe y hadoop.dll) en el siguiente repositorio público:
-[Repo de Hadoop-3.3.5](.https://github.com/cdarlint/winutils/tree/master/hadoop-3.3.5/bin)
+[Repo de Hadoop-3.3.5](https://github.com/cdarlint/winutils/tree/master/hadoop-3.3.5/bin)
 
 Pasos para configurar las rutas dentro del entorno de variables:
 
