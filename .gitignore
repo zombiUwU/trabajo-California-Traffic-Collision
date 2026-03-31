@@ -1,2 +1,5 @@
 # ignorar base de datos SQLite
 *.sqlite
+*.db
+*.sqlite3
+*.sqbpro
