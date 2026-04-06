@@ -16,4 +16,4 @@ print("Tablas disponibles:")
 for t in tables:
     print("-", t[0])
 
-conn.close()
+conn.close() 
