@@ -33,7 +33,6 @@ y cuántas desviaciones estándar se aleja de él. Ordena por desviación descen
         # Ejemplo de una consulta que el profesor podría pedir:
         # "Contar accidentes por tipo de clima"
         query_default = """
-        #consulta de ejemplo
         SELECT 
             weather_1, 
             COUNT(*) as total_accidentes 
