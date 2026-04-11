@@ -3,4 +3,5 @@
 *.db
 *.sqlite3
 *.sqbpro
-*.db
+*.json
+*.parquet

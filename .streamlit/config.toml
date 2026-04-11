@@ -1,0 +1,11 @@
+# .streamlit/config.toml - que bonito
+
+[theme]
+primaryColor="#D4AF37"          # Dorado Metálico (Oro)
+backgroundColor="#121212"       # Gris casi negro (Fondo)
+secondaryBackgroundColor="#242424" # Gris oscuro (Sidebar y widgets)
+textColor="#FFFFFF"             # Blanco puro (Letras)
+font="sans serif"
+
+# Fuente Times New Roman (Serif)
+font="sans serif"
