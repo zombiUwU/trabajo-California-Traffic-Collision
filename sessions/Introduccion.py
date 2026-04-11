@@ -1,7 +1,7 @@
 import streamlit as st
 
 def mostrar_introduccion():
-    st.title("📖 Introducción")
+    st.title("<h1 style='color: #D4AF37;'>📖 Introducción</h1>", unsafe_allow_html=True)
     st.divider()
     
     st.header("Análisis de Colisiones SWITRS")

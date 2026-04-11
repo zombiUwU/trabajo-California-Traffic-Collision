@@ -1,6 +1,6 @@
 import streamlit as st
 from utils.database import obtener_datos
-from sessions import Introduccion
+from sessions import Introduccion, querys
 import pandas as pd
 
 # Configuración de página
@@ -57,7 +57,7 @@ with st.sidebar:
     st.title("Navegación") 
     opcion = st.radio(
         "Seleccione una página:",
-        ["Presentación", "Introducción"]
+        ["Presentación", "Introducción","Querys"]
     )
 
 # Lógica de "Páginas"
@@ -80,3 +80,8 @@ if opcion == "Presentación":
 elif opcion == "Introducción":
     # Aquí solo se muestra lo que definimos en introduccion.py
     Introduccion.mostrar_introduccion()
+    
+elif opcion == "Querys":
+    # mostrando la pestanha de querys.py
+    querys.mostrar_querys()
+
