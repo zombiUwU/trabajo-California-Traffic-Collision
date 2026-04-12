@@ -9,3 +9,4 @@ delta-spark
 pyarrow
 pydrive2
 duckdb
+functools

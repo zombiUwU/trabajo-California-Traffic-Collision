@@ -1,52 +1,54 @@
-import pandas as pd
-import numpy as np 
+import pandas as pd 
+import numpy as np
+import functools 
+import streamlit as st
+import sys
 import os
-import sqlite3
-import zipfile
+# Esto permite que Utils.py encuentre a database.py aunque se llame desde fuera
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# Importamos las rutas desde el Config que ya arreglamos
-from Config import ZIP_PATH, DB_PATH, EXTRACT_PATH
+from database import obtener_datos
 
-def extraer_db_si_no_existe():
-    """Detecta si el archivo .db ya está extraído; si no, lo saca del ZIP."""
-    if not os.path.exists(DB_PATH):
-        print(f"📦 Extrayendo Base de Datos desde {ZIP_PATH}...")
-        try:
-            with zipfile.ZipFile(ZIP_PATH, 'r') as zip_ref:
-                zip_ref.extractall(EXTRACT_PATH)
-            print("✅ Base de datos lista.")
-        except Exception as e:
-            print(f"❌ Error al extraer el ZIP: {e}")
-    else:
-        print("💡 La base de datos ya está disponible.")
+# ... (Tus funciones de limpieza clean_missing_data, fix_types_and_ranges, etc., se quedan igual) ...
 
-def load_query_to_df(query):
-    """Conecta a SQLite, ejecuta una consulta y devuelve un DataFrame."""
-    extraer_db_si_no_existe()
-    try:
-        conn = sqlite3.connect(DB_PATH)
-        df = pd.read_sql_query(query, conn)
-        conn.close()
-        return df
-    except Exception as e:
-        print(f"❌ Error al ejecutar SQL: {e}")
+#-------------- Seccion de Carga de Datos (Sustituyendo SQL por Drive/Parquet) --------------
+
+# 1. Ya no necesitamos load_query_to_df porque no usamos SQLite local.
+# Usamos directamente obtener_datos(nombre_tabla) que ya tiene @st.cache_data
+
+# 2. Caché para la carga masiva de tablas (El "Gran Caché" adaptado)
+@st.cache_data
+def get_data_cached():
+    """
+    Carga los Parquets desde Drive (vía database.py).
+    """
+    # Cargamos solo las tablas que tienes configuradas
+    collisions = obtener_datos("collisions")
+    parties = obtener_datos("parties")
+    victims = obtener_datos("victims") # Esta es la que tiene la edad y el sexo
+    
+    return collisions, parties, victims
+    
+  
+
+# 3. Caché de pre-procesamiento para el Objetivo 1
+@st.cache_data
+def get_cleaned_demographics():
+    """
+    Procesa la tabla de víctimas directamente.
+    """
+    # Obtenemos los datos (ahora solo devolvemos 3 variables)
+    _, _, df_victims = get_data_cached()
+    
+    # Si la tabla está vacía, retornamos un DF vacío para evitar errores
+    if df_victims is None or df_victims.empty:
         return pd.DataFrame()
 
-def load_all_data():
-    """Carga las 4 tablas principales desde el archivo .db"""
-    print("🚀 Iniciando carga desde SQLite...")
-    
-    # Aquí hacemos las consultas reales a las tablas de la DB
-    collisions = load_query_to_df("SELECT * FROM collisions")
-    parties = load_query_to_df("SELECT * FROM parties")
-    victims_raw = load_query_to_df("SELECT * FROM victims")
-    victims_clean = load_query_to_df("SELECT * FROM involved_victims")
-    
-    print(f"✅ Tabla COLLISIONS: {len(collisions)} registros.")
-    print(f"✅ Tabla PARTIES: {len(parties)} registros.")
-    
-    return collisions, parties, victims_raw, victims_clean
+    # Aquí podrías aplicar limpieza extra si fuera necesario, 
+    # por ahora retornamos la tabla lista para los gráficos
+    return df_victims
 
+print("Utils configurado para trabajar con Parquets de Drive 🚀")
 
 ### creacion de funciones de limpieza y preparacion de datos para analisis de datos y visualizaciones 
     
@@ -332,50 +334,22 @@ def analizar_impacto_clima(df_collisions):
 #------------- Seccion KPI's------------
 
 def obtener_total_fatalidades(df_collisions):
-
     """
-
-    Suma el total de víctimas fatales en el dataset de colisiones.
-
-    Usa la columna 'killed_victims' de la tabla collision.
-
+    Usa la columna 'killed_victims' de la tabla de Colisiones.
     """
-
-    # 1. Sumamos la columna y convertimos a int para evitar el formato float
-
-    # Usamos fillna(0) por si hay nulos en la columna y evitar errores en la suma
-
-    total = df_collisions['killed_victims'].fillna(0).sum()
-
-   
-
-    return int(total)
-
+    if 'killed_victims' in df_collisions.columns:
+        return int(df_collisions['killed_victims'].sum())
+    return 0
 
 def obtener_genero_mayor_fatalidad(df_victims):
-
     """
-
-    Identifica el género con mayor índice de fatalidad basado en victim_degree_of_injury == 1.
-
+    Usa la tabla de Víctimas filtrando por los que tienen grado de lesión 1 (Fallecidos).
     """
-
-    # 1. Filtramos solo las víctimas fallecidas (Código 1 en SWITRS)
-
-    df_fatales = df_victims[df_victims['victim_degree_of_injury'] == 1]
-
-   
-
-    if not df_fatales.empty:
-
-        # 2. Retorna el valor más frecuente (moda) de la columna victim_sex
-
-        # .mode() devuelve una Serie, por lo que tomamos el índice [0]
-
-        return df_fatales['victim_sex'].mode()[0]
-
-   
-
+    # Filtramos: victim_degree_of_injury == 1 (Fallecido)
+    fatalidades = df_victims[df_victims['victim_degree_of_injury'] == 1]
+    
+    if not fatalidades.empty and 'victim_sex' in fatalidades.columns:
+        return fatalidades['victim_sex'].mode()[0]
     return "N/A"
 
 def obtener_promedio_edad(df_victims):
@@ -775,8 +749,4 @@ def obtener_vehiculo_mas_peligroso(df_merged):
 
     return "Tipo de vehículo no especificado"
 
-# --- BLOQUE DE PRUEBA AL FINAL ---
-if __name__ == "__main__":
-    col, part, v_raw, v_clean = load_all_data()
-    if not col.empty:
-        print(f"✅ Prueba exitosa: {len(col)} colisiones cargadas.")
+
