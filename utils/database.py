@@ -6,7 +6,21 @@ import streamlit as st
 @st.cache_resource
 def iniciar_sesion_drive():
     gauth = GoogleAuth()
-    gauth.LocalWebserverAuth() 
+    # Intenta cargar credenciales guardadas
+    gauth.LoadCredentialsFile("mycreds.txt")
+    
+    if gauth.credentials is None:
+        # Si no existen, pide login por navegador
+        gauth.LocalWebserverAuth()
+    elif gauth.access_token_expired:
+        # Si expiraron, las refresca automáticamente
+        gauth.Refresh()
+    else:
+        # Si existen, inicializa
+        gauth.Authorize()
+    
+    # Guarda las credenciales
+    gauth.SaveCredentialsFile("mycreds.txt")
     return GoogleDrive(gauth)
 
 @st.cache_data

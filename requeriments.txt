@@ -1,0 +1,13 @@
+delta_spark==4.2.0
+duckdb==1.5.2
+matplotlib==3.10.8
+numpy==2.4.4
+pandas==3.0.2
+plotly==6.7.0
+plotly-express==0.4.1
+pyarrow==23.0.1
+PyDrive2==1.21.3
+pyspark==4.1.1
+seaborn==0.13.2
+streamlit==1.56.0
+toml==0.10.2
