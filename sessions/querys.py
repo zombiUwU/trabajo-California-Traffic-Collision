@@ -38,7 +38,7 @@ y cuántas desviaciones estándar se aleja de él. Ordena por desviación descen
         """
 
         # Area de texto para escribir el SQL
-        sql_input = st.text_area("Escribe tu consulta SQL aquí:", value=query_default, height=150)
+        sql_input = st.text_area("Escribe tu primera consulta:", value=query_default, height=150)
 
         if st.button("Ejecutar primera Query"):
             try:
@@ -48,9 +48,7 @@ y cuántas desviaciones estándar se aleja de él. Ordena por desviación descen
                 st.markdown("<h3 style='color: #D4AF37;'>Resultado:</h3>", unsafe_allow_html=True)
                 st.dataframe(resultado, use_container_width=True)
 
-                # Opcional: Descargar resultado en CSV
-                csv = resultado.to_csv(index=False)
-                st.download_button("Descargar CSV", csv, "resultado_query.csv", "text/csv")
+                
 
             except Exception as e:
                 st.error(f"Error en la consulta SQL: {e}")
@@ -130,7 +128,7 @@ ORDER BY Franja_Horaria ASC, Cantidad_Fallecidos DESC;
         """
 
         # Area de texto para escribir el SQL
-        sql_input = st.text_area("Escribe tu consulta SQL aquí:", value=query_default, height=150)
+        sql_input = st.text_area("Escribe tu segunda consulta:", value=query_default, height=150)
 
         if st.button("Ejecutar segunda Query"):
             try:
@@ -140,5 +138,117 @@ ORDER BY Franja_Horaria ASC, Cantidad_Fallecidos DESC;
                 st.markdown("<h3 style='color: #D4AF37;'>Resultado:</h3>", unsafe_allow_html=True)
                 st.dataframe(resultado, use_container_width=True)
 
+            except Exception as e:
+                st.error(f"Error en la consulta SQL: {e}")
+
+    st.markdown("<h1 style='color: #D4AF37;'>⛁ Querys: Pregunta 3</h1>", unsafe_allow_html=True)
+    st.divider()
+    
+    st.header("Pregunta 3")
+    st.subheader("Evolución Mensual de la Severidad y Detección de Meses Atípicos")
+    st.markdown("""**Enunciado:**
+Para cada año disponible en la base de datos, calcula mes a mes el índice de severidad
+promedio de los accidentes (definido como: víctimas fatales * 3 + víctimas con lesión grave * 2
++ otras víctimas lesionadas * 1, dividido entre el total de accidentes del mes).
+Luego identifica, por año, qué meses presentaron un índice de severidad superior
+en más de un 30% al promedio anual de ese mismo año.
+Muestra el año, el mes, el índice del mes, el promedio anual y la variación porcentual.""")
+    st.markdown("---")
+
+    if not collisions.empty:
+        st.subheader("📝 Ejecutar Consulta")
+    
+        query_default = """
+        --query de ejemplo(cambienla)
+        SELECT * FROM collisions
+        LIMIT 5;
+        """
+
+        # Area de texto para escribir el SQL
+        sql_input = st.text_area("Escribe tu tercera consulta:", value=query_default, height=150)
+
+        if st.button("Ejecutar tercera Query"):
+            try:
+                # DuckDB puede leer directamente el DataFrame 'collisions' que cargamos arriba
+                resultado = duckdb.query(sql_input).to_df()
+
+                st.markdown("<h3 style='color: #D4AF37;'>Resultado:</h3>", unsafe_allow_html=True)
+                st.dataframe(resultado, use_container_width=True)
+                
+            except Exception as e:
+                st.error(f"Error en la consulta SQL: {e}")
+
+    st.markdown("<h1 style='color: #D4AF37;'>⛁ Querys: Pregunta 4</h1>", unsafe_allow_html=True)
+    st.divider()
+    
+    st.header("Pregunta 4")
+    st.subheader("Rutas Estatales con Patrón de Reincidencia en el Mismo Tramo")
+    st.markdown("""**Enunciado:**
+Detecta las rutas estatales donde hayan ocurrido al menos 3 accidentes graves o fatales
+en un radio de 0.5 millas (usando latitud y longitud) dentro de un mismo año calendario.
+Para cada clúster detectado, muestra la ruta, el año, las coordenadas del punto central
+del clúster, la cantidad de accidentes agrupados, el total de víctimas fatales y el factor
+de colisión primario más frecuente en ese clúster. Ordena por cantidad de accidentes
+por clúster de forma descendente.""")
+    st.markdown("---")
+
+    if not collisions.empty:
+        st.subheader("📝 Ejecutar Consulta")
+    
+        query_default = """
+        --query de ejemplo(cambienla)
+        SELECT * FROM collisions
+        LIMIT 5;
+        """
+
+        # Area de texto para escribir el SQL
+        sql_input = st.text_area("Escribe tu cuarta consulta:", value=query_default, height=150)
+
+        if st.button("Ejecutar cuarta Query"):
+            try:
+                # DuckDB puede leer directamente el DataFrame 'collisions' que cargamos arriba
+                resultado = duckdb.query(sql_input).to_df()
+
+                st.markdown("<h3 style='color: #D4AF37;'>Resultado:</h3>", unsafe_allow_html=True)
+                st.dataframe(resultado, use_container_width=True)
+                
+            except Exception as e:
+                st.error(f"Error en la consulta SQL: {e}")
+
+    st.markdown("<h1 style='color: #D4AF37;'>⛁ Querys: Pregunta 5</h1>", unsafe_allow_html=True)
+    st.divider()
+    
+    st.header("Pregunta 5")
+    st.subheader("Comparativa de Comportamiento de Riesgo por Grupo Demográfico y Tendencia Temporal")
+    st.markdown("""**Enunciado:**
+Construye un reporte que, para cada combinación de género y rango etario de los conductores declarados responsables del accidente (at_fault), muestre:
+1) La tasa de accidentes con alcohol involucrado sobre el total de accidentes donde ese
+grupo fue responsable.
+2) El ranking de esa tasa dentro de su mismo grupo de género.
+3) La variación de esa tasa respecto al año inmediatamente anterior.
+Incluye únicamente los grupos con más de 100 accidentes registrados como responsables
+y que muestren una tendencia creciente en al menos 2 años consecutivos.""")
+    st.markdown("---")
+
+    if not collisions.empty:
+        st.subheader("📝 Ejecutar Consulta")
+    
+        query_default = """
+        --query de ejemplo(cambienla)
+        SELECT * FROM collisions
+        LIMIT 5;
+        """
+
+        # Area de texto para escribir el SQL
+        sql_input = st.text_area("Escribe tu quinta consulta:", value=query_default, height=150)
+
+        if st.button("Ejecutar quinta Query"):
+            try:
+                # DuckDB puede leer directamente el DataFrame 'collisions' que cargamos arriba
+                resultado = duckdb.query(sql_input).to_df()
+
+                st.markdown("<h3 style='color: #D4AF37;'>Resultado:</h3>", unsafe_allow_html=True)
+                st.dataframe(resultado, use_container_width=True)
+                
             except Exception as e:
                 st.error(f"Error en la consulta SQL: {e}")

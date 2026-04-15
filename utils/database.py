@@ -2,25 +2,42 @@ import pandas as pd
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 import streamlit as st
+import os
 
 @st.cache_resource
 def iniciar_sesion_drive():
     gauth = GoogleAuth()
-    # Intenta cargar credenciales guardadas
+    
+    # Variables de Entorno
+    if "DRIVE_CREDS" in os.environ:
+        with open("mycreds.txt", "w") as f:
+            f.write(os.environ["DRIVE_CREDS"])
+    
+    # También necesitamos el client_secrets.json en Render
+    if "CLIENT_SECRETS" in os.environ:
+        with open("client_secrets.json", "w") as f:
+            f.write(os.environ["CLIENT_SECRETS"])
+    
+    # intentar cargar el archivo de credenciales
     gauth.LoadCredentialsFile("mycreds.txt")
     
     if gauth.credentials is None:
-        # Si no existen, pide login por navegador
+        # si el archivo no existe o está vacío, logueo por primera vez
         gauth.LocalWebserverAuth()
     elif gauth.access_token_expired:
-        # Si expiraron, las refresca automáticamente
-        gauth.Refresh()
+        # si se venció, lo refresca automaticamente
+        try:
+            gauth.Refresh()
+        except Exception:
+            # por si el refresh falla
+            gauth.LocalWebserverAuth()
     else:
-        # Si existen, inicializa
+        # si estan vigentes funciona normal
         gauth.Authorize()
     
-    # Guarda las credenciales
+    # Guardar SIEMPRE al final para mantener el token actualizado
     gauth.SaveCredentialsFile("mycreds.txt")
+    
     return GoogleDrive(gauth)
 
 @st.cache_data
