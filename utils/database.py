@@ -6,22 +6,20 @@ import json
 
 @st.cache_resource
 def iniciar_sesion_drive():
-    # Cargamos las credenciales desde los Secrets para no exponer archivos en GitHub
+    # Cargamos desde los Secrets para que sea persistente y seguro
     if "GOOGLE_SERVICE_ACCOUNT" in st.secrets:
         creds_dict = json.loads(st.secrets["GOOGLE_SERVICE_ACCOUNT"])
     else:
-        st.error("No se encontraron las credenciales de la Cuenta de Servicio.")
+        st.error("Falta la configuración GOOGLE_SERVICE_ACCOUNT en Secrets.")
         st.stop()
 
     settings = {
         "client_config_backend": "service",
-        "service_config": {
-            "client_json_dict": creds_dict
-        }
+        "service_config": {"client_json_dict": creds_dict}
     }
     
     gauth = GoogleAuth(settings=settings)
-    gauth.ServiceAuth()
+    gauth.ServiceAuth() # Autenticación silenciosa, sin navegador
     return GoogleDrive(gauth)
 
 @st.cache_data
