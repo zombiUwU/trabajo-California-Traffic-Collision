@@ -448,60 +448,35 @@ def obtener_accesorio_seguridad_mas_usado(df_victims):
 
 
 def preparar_datos_demograficos(df_victims):
-
     """
-
     Prepara el DataFrame de víctimas para análisis demográfico.
-
-    Estandariza victim_sex y crea la columna rango_edad.
-
+    Estandariza victim_sex y crea la columna rango_edad (categórica ordenada).
     """
-
     df = df_victims.copy()
 
-
-
     # 1. Limpieza básica: Eliminar filas sin edad o sin sexo definido
-
-    # Usamos los nombres exactos de tu tabla victims
-
     df = df.dropna(subset=['victim_age', 'victim_sex'])
 
-   
-
     # 2. Estandarizar Sexo: Mantenemos solo 'male' y 'female'
-
-    # SWITRS a veces trae 'm', 'f' o 'X' (desconocido). Filtramos lo analizable.
-
     df['victim_sex'] = df['victim_sex'].astype(str).str.lower().str.strip()
-
-   
-
-    # Mapeo rápido para normalizar m/f a male/female si fuera necesario
-
     mapeo_sex = {'m': 'male', 'f': 'female', 'male': 'male', 'female': 'female'}
-
     df['victim_sex'] = df['victim_sex'].map(mapeo_sex)
-
-   
-
-    # Filtramos para quedarnos solo con categorías claras
-
     df = df[df['victim_sex'].isin(['male', 'female'])]
 
-
-
     # 3. Crear Rangos Etarios: Agrupamos victim_age en bloques de 5 años
-
     bins = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 115]
-
     labels = [
-
         '0-4', '5-9', '10-14', '15-19', '20-24', '25-29', '30-34', '35-39',
-
         '40-44', '45-49', '50-54', '55-59', '60-64', '65-69', '70-74', '75-79', '80-84', '85+'
-
     ]
+
+    # Creamos la columna rango_edad usando pd.cut
+    df['rango_edad'] = pd.cut(df['victim_age'], bins=bins, labels=labels, right=False)
+
+    # 4. Convertir a categórica ordenada para garantizar el orden en gráficos
+    df['rango_edad'] = pd.Categorical(df['rango_edad'], categories=labels, ordered=True)
+
+    return df
 
    
 
