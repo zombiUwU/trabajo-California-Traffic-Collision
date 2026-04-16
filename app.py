@@ -1,6 +1,6 @@
 import streamlit as st
 from utils.database import obtener_datos
-from sessions import Introduccion, querys, ejemplo_filtrado, demografia, delta_lake
+from sessions import Introduccion, dict_DB, querys, ejemplo_filtrado, demografia, delta_lake, delimitacion
 import pandas as pd
 
 # Configuración de página
@@ -57,7 +57,7 @@ with st.sidebar:
     st.title("Navegación") 
     opcion = st.radio(
         "Seleccione una página:",
-        ["Presentación", "Introducción", "Delta Lake", "Perfil Demográfico", "Querys", "Querys de filtrado"]
+        ["Presentación", "Introducción", "Delimitacion de datos","Diccionario de datos", "Delta Lake", "Perfil Demográfico", "Querys", "Querys de filtrado"]
     )
 
 # Lógica de "Páginas"
@@ -81,14 +81,22 @@ elif opcion == "Introducción":
     # Aquí solo se muestra lo que definimos en introduccion.py
     Introduccion.mostrar_introduccion()
 
-elif opcion ==  "Delta Lake":
-    # llamamos el delta lake
-    delta_lake.mostrar_delta_lake()
+elif opcion == "Diccionario de datos":
+    # Llamada al nuevo archivo demografia.py
+    dict_DB.mostrar_diccionario_datos()
 
 elif opcion == "Perfil Demográfico":
     # Llamada al nuevo archivo demografia.py
     demografia.mostrar_demografia()
-    
+
+elif opcion ==  "Delta Lake":
+    # llamamos el delta lake
+    delta_lake.mostrar_delta_lake()
+
+elif opcion ==  "Delimitacion de datos":
+    # llamamos la delimitacion
+    delimitacion.mostrar_delimitacion()
+
 elif opcion == "Querys":
     # mostrando la pestanha de querys.py
     querys.mostrar_querys()
