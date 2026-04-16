@@ -24,7 +24,8 @@ def mostrar_querys_filtrado():
         "4. Victims", 
         "5. Involved Victims",
         "6. Denormalizacion_1",
-        "7. Denormalizacion_2"
+        "7. Denormalizacion_2",
+        "8. Denormalizacion_3"
     ])
 
     # --- PESTAÑA 0: PUNTOS A TENER EN CUENTA ---
@@ -252,7 +253,7 @@ def mostrar_querys_filtrado():
 
 
 # --- PESTAÑA 6: DENORMALIZACION_1 ---
-    with tab4:
+    with tab6:
         st.markdown("<h1 style='color: #D4AF37;'>⛁ Querys de denormalización: ¿Cúal es el perfil demografico de las victimas y la severidad de sus lesiones sufridas?</h1>", unsafe_allow_html=True)
         st.divider()
         st.markdown("""**Se seleccionaron los campos de victim_age, sexo_real, victim_degree_of_injury y victim_role, entre otros; para responder a criterios de análisis de riesgo y vulnerabilidad. Ademas, el codigo implementa una clasificación basada en rangos de edad mediante una estructura condicional**""")
@@ -293,7 +294,7 @@ JOIN collisions c ON c.case_id = iv.case_id;"""
 
 
 # --- PESTAÑA 7: DENORMALIZACION_2 ---
-    with tab4:
+    with tab7:
         st.markdown("<h1 style='color: #D4AF37;'>⛁ Querys de denormalización: ¿De qué manera influyen los factores de riesgo en la severidad del accidente y en la dinamica del vehículo?</h1>", unsafe_allow_html=True)
         st.divider()
         st.markdown("""**Se seleccionaron los campos con el fin de saber el por qué ocurrió y qué factores aumentaron el riesgo de un desenlace fatal.**""")
@@ -339,6 +340,60 @@ JOIN parties p ON p.case_id = c.case_id;
                     st.download_button("Descargar CSV", csv, "resultado_4.csv", "text/csv", key="dl_4")
                 except Exception as e:
                     st.error(f"Error en la consulta SQL: {e}")
+
+
+
+# --- PESTAÑA 8: DENORMALIZACION_3 ---
+    with tab8:
+        st.markdown("<h1 style='color: #D4AF37;'>⛁ Querys de denormalización: ¿Cómo influye el entorno en la severidad del accidente?</h1>", unsafe_allow_html=True)
+        st.divider()
+        st.markdown("""**Al unir campos de la tabla collision con datos de la tabla victims, el codigo permite visualizar que es mas probable de sufrir un accidente segun el suelo, valores climaticos, momento del dia, entre otros...**""")
+        st.markdown("---")
+
+        if not victims.empty:
+            st.subheader("📝 Ejecutar Consulta")
+            query_default = """SELECT
+c.case_id,
+c.collision_date,
+c.collision_time,
+CASE
+WHEN c.collision_time BETWEEN '00:00:00' AND '05:59:59' THEN 'Madrugada'
+WHEN c.collision_time BETWEEN '06:00:00' AND '11:59:59' THEN 'Mañana'
+WHEN c.collision_time BETWEEN '12:00:00' AND '17:59:59' THEN 'Tarde'
+WHEN c.collision_time BETWEEN '18:00:00' AND '23:59:59' THEN 'Noche'
+ELSE 'Desconocido'
+END AS momento_dia,
+c.weather_1,
+c.road_surface,
+c.location_type,
+c.longitude,
+c.latitude,
+c.collision_severity,
+v.victim_degree_of_injury
+FROM collisions c
+JOIN victims v ON v.case_id = c.case_id;
+"""
+
+            sql_input = st.text_area("Escribe tu consulta SQL aquí:", value=query_default, height=150, key="sql_4")
+
+            if st.button("Cuarto ejemplo de filtrado", key="btn_4"):
+                try:
+                    resultado = duckdb.query(sql_input).to_df()
+                    st.markdown("<h3 style='color: #D4AF37;'>Resultado:</h3>", unsafe_allow_html=True)
+                    st.dataframe(resultado, use_container_width=True)
+                    csv = resultado.to_csv(index=False)
+                    st.download_button("Descargar CSV", csv, "resultado_4.csv", "text/csv", key="dl_4")
+                except Exception as e:
+                    st.error(f"Error en la consulta SQL: {e}")
+
+
+
+
+
+
+
+
+
 
 
 
