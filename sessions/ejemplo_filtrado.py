@@ -16,13 +16,14 @@ def mostrar_querys_filtrado():
     st.divider()
 
     # Creación de 6 pestañas: La de puntos a tener en cuenta + las 5 de consultas
-    tab0, tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    tab0, tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "Puntos a tener en cuenta",
         "1. Case IDs", 
         "2. Collisions", 
         "3. Parties", 
         "4. Victims", 
-        "5. Involved Victims"
+        "5. Involved Victims",
+        "6. Denormalizacion1"
     ])
 
     # --- PESTAÑA 0: PUNTOS A TENER EN CUENTA ---
@@ -249,6 +250,45 @@ def mostrar_querys_filtrado():
 
 
 
+# --- PESTAÑA 6: DENORMALIZACION_1 ---
+    with tab4:
+        st.markdown("<h1 style='color: #D4AF37;'>⛁ Querys de denormalización: ¿Cúal es el perfil demografico de las victimas y la severidad de sus lesiones sufridas?</h1>", unsafe_allow_html=True)
+        st.divider()
+        st.markdown("""**Se seleccionaron los campos de victim_age, sexo_real, victim_degree_of_injury y victim_role, entre otros; para responder a criterios de análisis de riesgo y vulnerabilidad. Ademas, el codigo implementa una clasificación basada en rangos de edad mediante una estructura condicional**""")
+        st.markdown("---")
+
+        if not victims.empty:
+            st.subheader("📝 Ejecutar Consulta")
+            query_default = """ SELECT  
+    iv.id_victim as id, 
+    iv.case_id,
+    iv.victim_age,
+    CASE
+        WHEN iv.victim_age BETWEEN 16 AND 17 THEN 'Young'
+        WHEN iv.victim_age BETWEEN 18 AND 30 THEN 'Young_Adult'
+        WHEN iv.victim_age BETWEEN 31 AND 65 THEN 'Adult'
+        WHEN iv.victim_age BETWEEN 66 AND 120 THEN 'Older_Adult' 
+        ELSE 'Unlicensed_Driver'
+    END AS Age_classification,
+    iv.sexo_real,
+    v.victim_degree_of_injury,
+    v.victim_role,
+    c.collision_date
+FROM involved_victims iv
+JOIN victims v ON v.id_victim = iv.id_victim
+JOIN collisions c ON c.case_id = iv.case_id;"""
+
+            sql_input = st.text_area("Escribe tu consulta SQL aquí:", value=query_default, height=150, key="sql_4")
+
+            if st.button("Cuarto ejemplo de filtrado", key="btn_4"):
+                try:
+                    resultado = duckdb.query(sql_input).to_df()
+                    st.markdown("<h3 style='color: #D4AF37;'>Resultado:</h3>", unsafe_allow_html=True)
+                    st.dataframe(resultado, use_container_width=True)
+                    csv = resultado.to_csv(index=False)
+                    st.download_button("Descargar CSV", csv, "resultado_4.csv", "text/csv", key="dl_4")
+                except Exception as e:
+                    st.error(f"Error en la consulta SQL: {e}")
 
 
 
