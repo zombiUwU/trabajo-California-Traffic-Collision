@@ -5,18 +5,13 @@ pruebas.ipynb*
 
 # ignorar base de datos SQLite
 *.sqlite
+*.json
+*.toml
 *.db
 *.sqlite3
 *.sqbpro
-*.json
 *.parquet
-.streamlit/
 mycreds.txt
-client_secrets.json
 *.parquet
-
-.streamlit/secrets.toml
-mycreds.txt
-client_secrets.json
 __pycache__/
 *.parquet

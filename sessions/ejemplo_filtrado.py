@@ -16,7 +16,7 @@ def mostrar_querys_filtrado():
     st.divider()
 
     # Creación de 6 pestañas: La de puntos a tener en cuenta + las 5 de consultas
-    tab0, tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    tab0, tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8= st.tabs([
         "Puntos a tener en cuenta",
         "1. Case IDs", 
         "2. Collisions", 

@@ -332,9 +332,9 @@ WHERE m.indice_mes > (a.promedio_anio * 1.05)
 ORDER BY m.anio DESC, m.mes ASC;
             """
             
-            sql_input_1_val = st.text_area("Consulta de Validación (1 DE):", value=query_validacion, height=150, key="sql_1_val")
+            sql_input_1_val = st.text_area("Consulta de Validación (1 DE):", value=query_validacion, height=150, key="sql_3_val")
 
-            if st.button("Ejecutar Validación (1 DE)", key="btn_1_val"):
+            if st.button("Ejecutar Validación (1 DE)", key="btn_2_val"):
                 try:
                     resultado_val = duckdb.query(sql_input_1_val).to_df()
                     st.markdown("<h3 style='color: #D4AF37;'>Resultado de Validación:</h3>", unsafe_allow_html=True)

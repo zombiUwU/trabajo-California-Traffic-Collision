@@ -3,23 +3,27 @@ import streamlit as st
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 import json
+import os
 
 @st.cache_resource
 def iniciar_sesion_drive():
-    # Cargamos desde los Secrets para que sea persistente y seguro
+    # Cargamos el JSON directamente desde los Secrets
     if "GOOGLE_SERVICE_ACCOUNT" in st.secrets:
         creds_dict = json.loads(st.secrets["GOOGLE_SERVICE_ACCOUNT"])
     else:
-        st.error("Falta la configuración GOOGLE_SERVICE_ACCOUNT en Secrets.")
+        st.error("No se encontraron las credenciales en Secrets.")
         st.stop()
 
+    # Configuración para Cuenta de Servicio
     settings = {
         "client_config_backend": "service",
-        "service_config": {"client_json_dict": creds_dict}
+        "service_config": {
+            "client_json_dict": creds_dict
+        }
     }
     
     gauth = GoogleAuth(settings=settings)
-    gauth.ServiceAuth() # Autenticación silenciosa, sin navegador
+    gauth.ServiceAuth() # Autenticación directa sin navegador
     return GoogleDrive(gauth)
 
 @st.cache_data
@@ -38,16 +42,17 @@ def obtener_datos(nombre_tabla):
         "victims_lite":"1buJmDwvaHUdSf640Wen93BLqCD-vlz1g"
     }
     
-    if nombre_tabla not in IDS_TABLAS:
-        st.error(f"La tabla '{nombre_tabla}' no está configurada.")
-        return pd.DataFrame()
-
     drive = iniciar_sesion_drive()
     file_id = IDS_TABLAS[nombre_tabla]
-    
     temp_file = f"{nombre_tabla}.parquet"
     
     archivo_drive = drive.CreateFile({'id': file_id})
     archivo_drive.GetContentFile(temp_file)
     
-    return pd.read_parquet(temp_file)
+    df = pd.read_parquet(temp_file)
+    
+    # Limpieza: Borramos el archivo temporal después de leerlo
+    if os.path.exists(temp_file):
+        os.remove(temp_file)
+        
+    return df
