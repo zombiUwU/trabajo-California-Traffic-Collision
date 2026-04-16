@@ -10,3 +10,13 @@ pruebas.ipynb*
 *.sqbpro
 *.json
 *.parquet
+.streamlit/
+mycreds.txt
+client_secrets.json
+*.parquet
+
+.streamlit/secrets.toml
+mycreds.txt
+client_secrets.json
+__pycache__/
+*.parquet
