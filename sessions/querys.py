@@ -248,9 +248,38 @@ Muestra el año, el mes, el índice del mes, el promedio anual y la variación p
             st.subheader("📝 Ejecutar Consulta")
         
             query_default = """
-            --query de ejemplo(cambienla)
-            SELECT * FROM collisions
-            LIMIT 5;
+            WITH metricas_mensuales AS (
+-- Extraemos año y mes de la cadena de texto y calculamos la severidad
+SELECT
+CAST(SUBSTR(collision_date, 1, 4) AS INT) AS anio,
+CAST(SUBSTR(collision_date, 6, 2) AS INT) AS mes,
+COUNT(*) AS total_accidentes_mes,
+-- Calculamos la suma ponderada y dividimos entre el total del mes
+(SUM(CAST((killed_victims * 3) + (injured_victims * 1) AS FLOAT)) / COUNT(*)) AS indice_mes
+FROM collisions
+WHERE collision_date IS NOT NULL AND collision_date != ''
+GROUP BY anio, mes
+),
+promedio_anual AS (
+-- Promedio de los índices mensuales por cada año
+SELECT
+anio,
+AVG(indice_mes) AS promedio_anio
+FROM metricas_mensuales
+GROUP BY anio
+)
+-- Comparación final con el umbral del 30%
+SELECT
+m.anio,
+m.mes,
+ROUND(m.indice_mes, 4) AS indice_del_mes,
+ROUND(a.promedio_anio, 4) AS promedio_anual,
+ROUND(((m.indice_mes - a.promedio_anio) / a.promedio_anio) * 100, 2) AS variacion_porcentual
+FROM metricas_mensuales m
+JOIN promedio_anual a ON m.anio = a.anio
+WHERE m.indice_mes > (a.promedio_anio * 1.30)
+ORDER BY m.anio DESC, m.mes ASC;
+
             """
 
             # Area de texto para escribir el SQL
@@ -266,6 +295,52 @@ Muestra el año, el mes, el índice del mes, el promedio anual y la variación p
                     
                 except Exception as e:
                     st.error(f"Error en la consulta SQL: {e}")
+                   
+            st.divider()
+            st.subheader("🔍 Prueba de validación (umbral de 5%)")
+            st.info("Esta sección ejecuta la misma lógica pero nos permite observar cualquier mes que este ligeramente por encima de la media.")
+
+            query_validacion = """
+WITH metricas_mensuales AS (
+SELECT
+CAST(SUBSTR(TRIM(collision_date), 1, 4) AS INT) AS anio,
+CAST(SUBSTR(TRIM(collision_date), 6, 2) AS INT) AS mes,
+COUNT(*) AS total_accidentes_mes,
+-- Usamos COALESCE para que si una columna es NULL la trate como 0
+(SUM(CAST((COALESCE(killed_victims,0) * 3) + (COALESCE(injured_victims,0) * 1) AS FLOAT)) / COUNT(*)) AS indice_mes
+FROM collisions
+WHERE collision_date IS NOT NULL AND collision_date != ''
+GROUP BY anio, mes
+),
+promedio_anual AS (
+SELECT
+anio,
+AVG(indice_mes) AS promedio_anio
+FROM metricas_mensuales
+GROUP BY anio
+)
+SELECT
+m.anio,
+m.mes,
+ROUND(m.indice_mes, 4) AS indice_del_mes,
+ROUND(a.promedio_anio, 4) AS promedio_anual,
+ROUND(((m.indice_mes - a.promedio_anio) / NULLIF(a.promedio_anio, 0)) * 100, 2) AS variacion_porcentual
+FROM metricas_mensuales m
+JOIN promedio_anual a ON m.anio = a.anio
+-- Bajamos al 5% (1.05)
+WHERE m.indice_mes > (a.promedio_anio * 1.05)
+ORDER BY m.anio DESC, m.mes ASC;
+            """
+            
+            sql_input_1_val = st.text_area("Consulta de Validación (1 DE):", value=query_validacion, height=150, key="sql_1_val")
+
+            if st.button("Ejecutar Validación (1 DE)", key="btn_1_val"):
+                try:
+                    resultado_val = duckdb.query(sql_input_1_val).to_df()
+                    st.markdown("<h3 style='color: #D4AF37;'>Resultado de Validación:</h3>", unsafe_allow_html=True)
+                    st.dataframe(resultado_val, use_container_width=True)
+                except Exception as e:
+                    st.error(f"Error en la consulta de validación: {e}")
 
     with tab4:
         st.markdown("<h1 style='color: #D4AF37;'>⛁ Querys: Pregunta 4</h1>", unsafe_allow_html=True)
