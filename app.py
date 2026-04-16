@@ -57,7 +57,7 @@ with st.sidebar:
     st.title("Navegación") 
     opcion = st.radio(
         "Seleccione una página:",
-        ["Presentación", "Introducción","Diccionario de datos", "Perfil Demográfico","Delta Lake", "Delimitacion de datos", "Factores de RiesgoQuerys","Querys", "Querys de filtrado", "Factores de Riesgo"]
+        ["Presentación", "Introducción","Diccionario de datos", "Perfil Demográfico","Delta Lake", "Delimitacion de datos","Querys", "Querys de filtrado", "Factores de Riesgo"]
     )
 
 # Lógica de "Páginas"
