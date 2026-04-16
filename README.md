@@ -124,6 +124,8 @@ pip install -r requirements.txt
 Para lanzar la aplicación interactiva, usa:
 streamlit run app.py
 
+Para ver nuestro proyecto usa este link: [SWITRS](https://zombiuwu-trabajo-california-traffic-collision-app-nlucar.streamlit.app/)
+
 ### 5. Dashboard de Inteligencia de Negocios (Power BI)
 
 Puedes observar el dashboard de este trabajo desplegado en power bi, en el siguiente link:
@@ -173,7 +175,6 @@ Kaggle Dataset:
 [BD-SWITRS](https://www.kaggle.com/datasets/alexgude/california-traffic-collision-data-from-switrs)
 
 ---
-
 ## Autores
 
 Proyecto realizado por estudiantes del segundo semestre de la carrera de Estadística y Ciencias Actuariales en la Universidad Central de Venezuela (UCV)
