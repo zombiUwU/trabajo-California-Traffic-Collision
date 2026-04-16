@@ -1,6 +1,10 @@
 import streamlit as st
 from utils.database import obtener_datos
+<<<<<<< Updated upstream
 from sessions import Introduccion, dict_DB, querys, ejemplo_filtrado, demografia, delta_lake, delimitacion
+=======
+from sessions import Introduccion, querys, ejemplo_filtrado, demografia, factores_riesgo
+>>>>>>> Stashed changes
 import pandas as pd
 
 # Configuración de página
@@ -57,7 +61,11 @@ with st.sidebar:
     st.title("Navegación") 
     opcion = st.radio(
         "Seleccione una página:",
+<<<<<<< Updated upstream
         ["Presentación", "Introducción", "Delimitacion de datos","Diccionario de datos", "Delta Lake", "Perfil Demográfico", "Querys", "Querys de filtrado"]
+=======
+        ["Presentación", "Introducción", "Perfil Demográfico", "Querys", "Querys de filtrado", "Factores de Riesgo"]
+>>>>>>> Stashed changes
     )
 
 # Lógica de "Páginas"
@@ -104,3 +112,6 @@ elif opcion == "Querys":
 elif opcion == "Querys de filtrado":
     # mostrando la pestanha de querys_filtrado.py
     ejemplo_filtrado.mostrar_querys_filtrado()
+
+elif opcion == "Factores de Riesgo":
+    factores_riesgo.mostrar_factores_riesgo()
