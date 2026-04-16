@@ -1,43 +1,27 @@
 import pandas as pd
+import streamlit as st
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
-import streamlit as st
-import os
+import json
 
 @st.cache_resource
 def iniciar_sesion_drive():
-    gauth = GoogleAuth()
-    
-    # Variables de Entorno
-    if "DRIVE_CREDS" in os.environ:
-        with open("mycreds.txt", "w") as f:
-            f.write(os.environ["DRIVE_CREDS"])
-    
-    # También necesitamos el client_secrets.json en Render
-    if "CLIENT_SECRETS" in os.environ:
-        with open("client_secrets.json", "w") as f:
-            f.write(os.environ["CLIENT_SECRETS"])
-    
-    # intentar cargar el archivo de credenciales
-    gauth.LoadCredentialsFile("mycreds.txt")
-    
-    if gauth.credentials is None:
-        # si el archivo no existe o está vacío, logueo por primera vez
-        gauth.LocalWebserverAuth()
-    elif gauth.access_token_expired:
-        # si se venció, lo refresca automaticamente
-        try:
-            gauth.Refresh()
-        except Exception:
-            # por si el refresh falla
-            gauth.LocalWebserverAuth()
+    # Cargamos las credenciales desde los Secrets para no exponer archivos en GitHub
+    if "GOOGLE_SERVICE_ACCOUNT" in st.secrets:
+        creds_dict = json.loads(st.secrets["GOOGLE_SERVICE_ACCOUNT"])
     else:
-        # si estan vigentes funciona normal
-        gauth.Authorize()
+        st.error("No se encontraron las credenciales de la Cuenta de Servicio.")
+        st.stop()
+
+    settings = {
+        "client_config_backend": "service",
+        "service_config": {
+            "client_json_dict": creds_dict
+        }
+    }
     
-    # Guardar SIEMPRE al final para mantener el token actualizado
-    gauth.SaveCredentialsFile("mycreds.txt")
-    
+    gauth = GoogleAuth(settings=settings)
+    gauth.ServiceAuth()
     return GoogleDrive(gauth)
 
 @st.cache_data
