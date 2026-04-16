@@ -2,11 +2,35 @@ import pandas as pd
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 import streamlit as st
+import os
 
 @st.cache_resource
 def iniciar_sesion_drive():
     gauth = GoogleAuth()
-    gauth.LocalWebserverAuth() 
+    
+    if "DRIVE_CREDS" in st.secrets:
+        with open("mycreds.txt", "w") as f:
+            f.write(st.secrets["DRIVE_CREDS"])
+            
+    if "CLIENT_SECRETS" in st.secrets:
+        with open("client_secrets.json", "w") as f:
+            f.write(st.secrets["CLIENT_SECRETS"])
+    
+    gauth.LoadClientConfigFile("client_secrets.json") 
+    gauth.LoadCredentialsFile("mycreds.txt")
+    
+    if gauth.credentials is None:
+        gauth.LocalWebserverAuth()
+    elif gauth.access_token_expired:
+        try:
+            gauth.Refresh()
+        except Exception:
+            gauth.LocalWebserverAuth()
+    else:
+        gauth.Authorize()
+    
+    gauth.SaveCredentialsFile("mycreds.txt")
+    
     return GoogleDrive(gauth)
 
 @st.cache_data
@@ -15,7 +39,14 @@ def obtener_datos(nombre_tabla):
         "victims": "1T4KefyFn2FghnMzLksbyVUXsnRfk_Fwu",
         "parties": "1Q2hJ2A6N9uW-h-14_HTasxigVJLZTouC",
         "case_ids": "1_C3_xRGa3G325_ztT6fw7uTB1sdRQhfD",
-        "collisions": "1iDGYdPq2zk-Yi6Sks1K5YayOfN4aJ2d_"
+        "collisions": "1iDGYdPq2zk-Yi6Sks1K5YayOfN4aJ2d_",
+        
+        ### las tablas lite son para el ejemplo de la selección y normalización  ###
+
+        "case_ids_lite": "1L1y1xijvDHnod8XMrb1vU54KYPXbhmza",
+        "collision_lite":"1wj3MI6odBf2zikvuRm2xAuxnXX2UV-Zx",
+        "parties_lite":"1javvbygFD4Cha8arZd1hoFUuuTbx2r2n",
+        "victims_lite":"1buJmDwvaHUdSf640Wen93BLqCD-vlz1g"
     }
     
     if nombre_tabla not in IDS_TABLAS:

@@ -1,7 +1,22 @@
+# Ignorar carpetas y archivos
+**/__pycache__/
+mycreds.txt*
+pruebas.ipynb*
+
 # ignorar base de datos SQLite
 *.sqlite
 *.db
 *.sqlite3
 *.sqbpro
 *.json
+*.parquet
+.streamlit/
+mycreds.txt
+client_secrets.json
+*.parquet
+
+.streamlit/secrets.toml
+mycreds.txt
+client_secrets.json
+__pycache__/
 *.parquet
