@@ -9,13 +9,13 @@ def mostrar_querys():
     with st.spinner("Cargando tablas desde Drive para la consulta..."):
         collisions = obtener_datos("collisions")
         parties = obtener_datos("parties")
-        case_ids = obtener_datos("case_ids")
         victims = obtener_datos("victims")   
 
     # Definición de las pestañas
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["Pregunta 1", "Pregunta 2", "Pregunta 3", "Pregunta 4", "Pregunta 5"])
 
     with tab1:
+        
         st.markdown("<h1 style='color: #D4AF37;'>⛁ Querys: Pregunta 1</h1>", unsafe_allow_html=True)
         st.divider()
         
