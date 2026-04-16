@@ -32,27 +32,115 @@ y cuántas desviaciones estándar se aleja de él. Ordena por desviación descen
         st.markdown("---")
 
         if not collisions.empty:
-            st.subheader("📝 Ejecutar Consulta")
+            st.subheader("📝 Ejecutar Consulta (2 Desviaciones - Enunciado)")
         
             query_default = """
-            --query de ejemplo(cambienla)
-            SELECT * FROM collisions
-            LIMIT 5;
+            WITH metricas_por_accidente AS (
+    SELECT 
+        c.case_id,
+        c.location_type AS condado, 
+        CASE WHEN (
+            (LOWER(p.party_sobriety) LIKE '%had been drinking%') 
+            AND (p.cellphone_in_use = '1') 
+            AND (LOWER(c.lighting) LIKE '%dark%' OR LOWER(c.lighting) LIKE '%dusk%' OR LOWER(c.lighting) LIKE '%dawn%')
+        ) THEN 1 ELSE 0 END AS cumple_factores
+    FROM collisions c
+    JOIN parties p ON c.case_id = p.case_id
+),
+estadisticas_condado AS (
+    SELECT 
+        condado,
+        COUNT(*) AS total_accidentes,
+        SUM(cumple_factores) AS accidentes_con_factores,
+        (CAST(SUM(cumple_factores) AS FLOAT) / NULLIF(COUNT(*), 0)) AS proporcion_condado
+    FROM metricas_por_accidente
+    GROUP BY condado
+),
+promedio_estatal AS (
+    SELECT 
+        AVG(proporcion_condado) AS media_estatal,
+        SQRT(AVG(proporcion_condado * proporcion_condado) - (AVG(proporcion_condado) * AVG(proporcion_condado))) AS desv_estatal
+    FROM estadisticas_condado
+)
+SELECT 
+    e.condado,
+    e.total_accidentes,
+    e.accidentes_con_factores,
+    ROUND(e.proporcion_condado, 5) AS proporcion,
+    ROUND(p.media_estatal, 5) AS promedio_estatal,
+    ROUND((e.proporcion_condado - p.media_estatal) / NULLIF(p.desv_estatal, 0), 2) AS desviaciones_estandar
+FROM estadisticas_condado e, promedio_estatal p
+WHERE (e.proporcion_condado - p.media_estatal) > (2 * p.desv_estatal) -- Mantenemos el 2 del enunciado
+ORDER BY desviaciones_estandar DESC;
             """
 
             # Area de texto para escribir el SQL
-            sql_input = st.text_area("Escribe tu primera consulta:", value=query_default, height=150, key="sql_1")
+            sql_input_1 = st.text_area("Escribe tu primera consulta:", value=query_default, height=150, key="sql_1")
 
             if st.button("Ejecutar primera Query", key="btn_1"):
                 try:
-                    # DuckDB puede leer directamente el DataFrame 'collisions' que cargamos arriba
-                    resultado = duckdb.query(sql_input).to_df()
-
+                    resultado = duckdb.query(sql_input_1).to_df()
                     st.markdown("<h3 style='color: #D4AF37;'>Resultado:</h3>", unsafe_allow_html=True)
                     st.dataframe(resultado, use_container_width=True)
-
                 except Exception as e:
                     st.error(f"Error en la consulta SQL: {e}")
+
+            st.divider()
+            st.subheader("🔍 Prueba de validación (1 Desviación)")
+            st.info("Esta sección ejecuta la misma lógica pero con un umbral de 1 desviación estándar para visualizar datos existentes.")
+
+            query_validacion = """
+WITH metricas_por_accidente AS (
+   -- usamos las variables party_sobriety, condado y lighting como filtro he indicador 
+    SELECT 
+        c.case_id,
+        c.location_type AS condado, 
+        CASE WHEN (
+            (LOWER(p.party_sobriety) LIKE '%had been drinking%') 
+            AND (p.cellphone_in_use = '1') 
+            AND (LOWER(c.lighting) LIKE '%dark%' OR LOWER(c.lighting) LIKE '%dusk%' OR LOWER(c.lighting) LIKE '%dawn%')
+        ) THEN 1 ELSE 0 END AS cumple_factores
+    FROM collisions c
+    JOIN parties p ON c.case_id = p.case_id
+),
+estadisticas_condado AS (
+    -- Agrupamos por condado para obtener totales y proporciones
+    SELECT 
+        condado,
+        COUNT(*) AS total_accidentes,
+        SUM(cumple_factores) AS accidentes_con_factores,
+        (CAST(SUM(cumple_factores) AS FLOAT) / NULLIF(COUNT(*), 0)) AS proporcion_condado
+    FROM metricas_por_accidente
+    GROUP BY condado
+),
+promedio_estatal AS (
+    SELECT 
+        AVG(proporcion_condado) AS media_estatal,
+        -- Fórmula: SQRT( AVG(x^2) - AVG(x)^2 )
+        SQRT(AVG(proporcion_condado * proporcion_condado) - (AVG(proporcion_condado) * AVG(proporcion_condado))) AS desv_estatal
+    FROM estadisticas_condado
+)
+SELECT 
+    e.condado,
+    e.total_accidentes,
+    e.accidentes_con_factores,
+    ROUND(e.proporcion_condado, 5) AS proporcion,
+    ROUND(p.media_estatal, 5) AS promedio_estatal,
+    ROUND((e.proporcion_condado - p.media_estatal) / NULLIF(p.desv_estatal, 0), 2) AS desviaciones_estandar
+FROM estadisticas_condado e, promedio_estatal p
+WHERE (e.proporcion_condado - p.media_estatal) > (1 * p.desv_estatal) 
+ORDER BY desviaciones_estandar DESC;
+            """
+            
+            sql_input_1_val = st.text_area("Consulta de Validación (1 DE):", value=query_validacion, height=150, key="sql_1_val")
+
+            if st.button("Ejecutar Validación (1 DE)", key="btn_1_val"):
+                try:
+                    resultado_val = duckdb.query(sql_input_1_val).to_df()
+                    st.markdown("<h3 style='color: #D4AF37;'>Resultado de Validación:</h3>", unsafe_allow_html=True)
+                    st.dataframe(resultado_val, use_container_width=True)
+                except Exception as e:
+                    st.error(f"Error en la consulta de validación: {e}")
 
     with tab2:
         st.markdown("<h1 style='color: #D4AF37;'>⛁ Querys: Pregunta 2</h1>", unsafe_allow_html=True)
