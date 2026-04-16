@@ -18,7 +18,7 @@ Desarrollar un análisis de datos sobre la siniestralidad vial en California (20
 
 - **Determinar factores externos determinantes de una colisión**: Determinar el impacto de las conductas de riesgo (*cellphone_in_use, party_sobriety, entre otros...*) y la eficacia del equipo de seguridad (*victim_safety_equipment*) en la severidad de las lesiones y la ocurrencia de víctimas fatales.
 
-- **Visualizar la criticidad geográfica y temporal**: Mapear los incidentes y su evolución anual para detectar si las políticas de seguridad vial han surtido efecto post-pandemia.
+- **Visualizar la criticidad geográfica y temporal**: Mapear los incidentes y su evolución anual, comparar el efecto pre-pandemia y pandemia.
 
 ---
 
@@ -83,7 +83,6 @@ Sigue estos pasos para replicar el análisis y visualizar los dashboards en tu e
 
 Asegúrate de tener instalado:
 -Python 3.8+
--Power BI Desktop (para abrir el archivo .pbix)
 -Java 8.0 o superior.
 -hadoop.
 -SQLite.
@@ -127,10 +126,9 @@ streamlit run app.py
 
 ### 5. Dashboard de Inteligencia de Negocios (Power BI)
 
-Dirígete a la carpeta dashboard/.
-Abre el archivo Analisis_SWITRS_California.pbix.
-(Opcional) Si los datos no cargan, actualiza la ruta de la fuente de datos apuntando al archivo SQLite o CSV en la carpeta data/.
+Puedes observar el dashboard de este trabajo desplegado en power bi, en el siguiente link:
 
+https://app.powerbi.com/view?r=eyJrIjoiMjIxNTU2ZGYtNzMyYy00NmQyLWIxMGYtMTMyMDAzMDE0MzNkIiwidCI6IjRjODE4Zjc5LWFiODQtNDU1Mi05YjdjLTJmZTcxNWIwZDBkNSIsImMiOjR9
 ---
 
 ## Lógica detrás de la delimitación de la data
