@@ -280,9 +280,9 @@ FROM involved_victims iv
 JOIN victims v ON v.id_victim = iv.id_victim
 JOIN collisions c ON c.case_id = iv.case_id;"""
 
-            sql_input = st.text_area("Escribe tu consulta SQL aquí:", value=query_default, height=150, key="sql_4")
+            sql_input = st.text_area("Escribe tu consulta SQL aquí:", value=query_default, height=150, key="sql_6")
 
-            if st.button("Cuarto ejemplo de filtrado", key="btn_4"):
+            if st.button("Cuarto ejemplo de filtrado", key="btn_6"):
                 try:
                     resultado = duckdb.query(sql_input).to_df()
                     st.markdown("<h3 style='color: #D4AF37;'>Resultado:</h3>", unsafe_allow_html=True)
@@ -329,9 +329,9 @@ FROM collisions c
 JOIN parties p ON p.case_id = c.case_id;
 """
 
-            sql_input = st.text_area("Escribe tu consulta SQL aquí:", value=query_default, height=150, key="sql_4")
+            sql_input = st.text_area("Escribe tu consulta SQL aquí:", value=query_default, height=150, key="sql_7")
 
-            if st.button("Cuarto ejemplo de filtrado", key="btn_4"):
+            if st.button("Cuarto ejemplo de filtrado", key="btn_7"):
                 try:
                     resultado = duckdb.query(sql_input).to_df()
                     st.markdown("<h3 style='color: #D4AF37;'>Resultado:</h3>", unsafe_allow_html=True)
@@ -374,9 +374,9 @@ FROM collisions c
 JOIN victims v ON v.case_id = c.case_id;
 """
 
-            sql_input = st.text_area("Escribe tu consulta SQL aquí:", value=query_default, height=150, key="sql_4")
+            sql_input = st.text_area("Escribe tu consulta SQL aquí:", value=query_default, height=150, key="sql_8")
 
-            if st.button("Cuarto ejemplo de filtrado", key="btn_4"):
+            if st.button("Cuarto ejemplo de filtrado", key="btn_8"):
                 try:
                     resultado = duckdb.query(sql_input).to_df()
                     st.markdown("<h3 style='color: #D4AF37;'>Resultado:</h3>", unsafe_allow_html=True)

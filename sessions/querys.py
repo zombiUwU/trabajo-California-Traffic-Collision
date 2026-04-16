@@ -431,7 +431,7 @@ por clúster de forma descendente.""")
             ORDER BY c.cantidad_accidentes DESC;"""
 
             # Area de texto para escribir el SQL
-            sql_input = st.text_area("Escribe tu cuarta consulta:", value=query_default, height=150, key="sql_4")
+            sql_input = st.text_area("Escribe tu cuarta consulta:", value=query_default, height=150, key="sql_8")
 
             if st.button("Ejecutar cuarta Query", key="btn_4"):
                 try:
