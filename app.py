@@ -108,6 +108,6 @@ elif opcion == "Querys de filtrado":
 elif opcion == "Factores de Riesgo":
     factores_riesgo.mostrar_factores_riesgo()
 
-elif opcion == "Criticidad Temporal"
+elif opcion == "Criticidad Temporal":
     # mosttrando la pestanha de criticidad_temporal.py
     criticidad_temporal.mostrar_criticidad()
