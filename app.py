@@ -1,6 +1,6 @@
 import streamlit as st
 from utils.database import obtener_datos
-from sessions import Introduccion, querys, ejemplo_filtrado,dict_DB,delimitacion,delta_lake, demografia, factores_riesgo
+from sessions import Introduccion, querys, ejemplo_filtrado,dict_DB, criticidad_temporal, delimitacion,delta_lake, demografia, factores_riesgo
 import pandas as pd
 
 # Configuración de página
@@ -57,7 +57,7 @@ with st.sidebar:
     st.title("Navegación") 
     opcion = st.radio(
         "Seleccione una página:",
-        ["Presentación", "Introducción","Diccionario de datos", "Perfil Demográfico","Delta Lake", "Delimitacion de datos","Querys", "Querys de filtrado", "Factores de Riesgo"]
+        ["Presentación", "Introducción","Diccionario de datos", "Perfil Demográfico","Criticidad Temporal","Delta Lake", "Delimitacion de datos","Querys", "Querys de filtrado", "Factores de Riesgo"]
     )
 
 # Lógica de "Páginas"
@@ -107,3 +107,7 @@ elif opcion == "Querys de filtrado":
 
 elif opcion == "Factores de Riesgo":
     factores_riesgo.mostrar_factores_riesgo()
+
+elif opcion == "Criticidad Temporal":
+    # mosttrando la pestanha de criticidad_temporal.py
+    criticidad_temporal.mostrar_criticidad()
