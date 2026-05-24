@@ -1,60 +1,50 @@
-import pandas as pd
 import streamlit as st
-from pydrive2.auth import GoogleAuth
-from pydrive2.drive import GoogleDrive
-import json
-import os
+import duckdb
+import pandas as pd
 
+# Conexión cacheada a MotherDuck (se abre una sola vez)
 @st.cache_resource
-def iniciar_sesion_drive():
-    # Cargamos el JSON directamente desde los Secrets
-    if "GOOGLE_SERVICE_ACCOUNT" in st.secrets:
-        creds_dict = json.loads(st.secrets["GOOGLE_SERVICE_ACCOUNT"])
-    else:
-        st.error("No se encontraron las credenciales en Secrets.")
-        st.stop()
+def get_md_connection():
+    token = st.secrets["motherduck"]["token"]
+    return duckdb.connect(f'md:accidentes_california?motherduck_token={token}')
 
-    # Configuración para Cuenta de Servicio
-    settings = {
-        "client_config_backend": "service",
-        "service_config": {
-            "client_json_dict": creds_dict
-        }
-    }
-    
-    gauth = GoogleAuth(settings=settings)
-    gauth.ServiceAuth() # Autenticación directa sin navegador
-    return GoogleDrive(gauth)
+# Función de consulta con caché (10 minutos)
+@st.cache_data(ttl=600)
+def run_query(query):
+    conn = get_md_connection()
+    try:
+        return conn.execute(query).df()
+    except Exception as e:
+        st.error(f"Error en consulta: {e}")
+        return pd.DataFrame()
 
+# Adaptación de obtener_datos: misma firma, misma funcionalidad
 @st.cache_data
 def obtener_datos(nombre_tabla):
-    IDS_TABLAS = {
-        "victims": "1T4KefyFn2FghnMzLksbyVUXsnRfk_Fwu",
-        "parties": "1Q2hJ2A6N9uW-h-14_HTasxigVJLZTouC",
-        "case_ids": "1_C3_xRGa3G325_ztT6fw7uTB1sdRQhfD",
-        "collisions": "1iDGYdPq2zk-Yi6Sks1K5YayOfN4aJ2d_",
-        
-        ### las tablas lite son para el ejemplo de la selección y normalización  ###
-
-        "case_ids_lite": "1L1y1xijvDHnod8XMrb1vU54KYPXbhmza",
-        "collision_lite":"1wj3MI6odBf2zikvuRm2xAuxnXX2UV-Zx",
-        "parties_lite":"1javvbygFD4Cha8arZd1hoFUuuTbx2r2n",
-        "victims_lite":"1buJmDwvaHUdSf640Wen93BLqCD-vlz1g",
-        "involved_victims_part_0":"1bDpp9EymHAd8Ubx4lngrgzrtCJL27XGD"
-
+    """
+    Obtiene los datos de la tabla especificada desde MotherDuck.
+    Soporta los nombres de tabla que ya usas en tu app:
+    'collisions', 'parties', 'victims', 'case_ids'
+    """
+    # Mapeo de nombres que usas en tu app a los nombres reales en MotherDuck
+    mapeo_tablas = {
+    "collisions": "collisions",
+    "parties": "parties",
+    "victims": "victims",
+    "case_ids": "case_ids",
+    # Si necesitas redirigir versiones lite a la tabla completa:
+    "case_ids_lite": "case_ids",
+    "collision_lite": "collisions",
+    "parties_lite": "parties",
+    "victims_lite": "victims",
+    "involved_victims_part_0": "involved_victims"
     }
-    
-    drive = iniciar_sesion_drive()
-    file_id = IDS_TABLAS[nombre_tabla]
-    temp_file = f"{nombre_tabla}.parquet"
-    
-    archivo_drive = drive.CreateFile({'id': file_id})
-    archivo_drive.GetContentFile(temp_file)
-    
-    df = pd.read_parquet(temp_file)
-    
-    # Limpieza: Borramos el archivo temporal después de leerlo
-    if os.path.exists(temp_file):
-        os.remove(temp_file)
-        
+    tabla_real = mapeo_tablas.get(nombre_tabla, nombre_tabla)
+
+    query = f"SELECT * FROM {tabla_real}"
+    df = run_query(query)
+
+    if df.empty:
+        st.warning(f"La tabla '{nombre_tabla}' no se encontró o está vacía en MotherDuck.")
+
     return df

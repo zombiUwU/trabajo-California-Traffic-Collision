@@ -15,3 +15,8 @@ mycreds.txt
 *.parquet
 __pycache__/
 *.parquet
+
+# Ignorar scripts de migración con tokens
+migrar_a_motherduck.py*
+rellenar_tablas.py*
+prueba_motherduck.py*
